@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"sync"
 	"text/template"
 
@@ -27,11 +28,11 @@ func generateFiles(answers *models.WizardAnswers) {
 
 	if answers.Controller {
 		wg.Add(1)
-		go generateController(cwd, answers.ModuleName)
+		go generateController(cwd, answers)
 	}
 }
 
-func generateController(cwd string, moduleName string) error {
+func generateController(cwd string, answers *models.WizardAnswers) error {
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Controller"))
 	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/controllers/", cwd), 0744)
 	if mkDirErr != nil {
@@ -39,7 +40,7 @@ func generateController(cwd string, moduleName string) error {
 		os.Exit(1)
 	}
 
-	w, err := os.Create(fmt.Sprintf("%s/controllers/%s.controller.ts", cwd, moduleName))
+	w, err := os.Create(fmt.Sprintf("%s/controllers/%s.controller.ts", cwd, answers.ModuleName))
 	if err != nil {
 		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create controller file"), err)
 		os.Exit(1)
@@ -47,7 +48,7 @@ func generateController(cwd string, moduleName string) error {
 	defer w.Close()
 
 	cTmpl := template.Must(template.New("controller").Funcs(tempFuncs).Parse(ct.ControllerTemplate))
-	cTmpl.Execute(w, "")
+	cTmpl.Execute(w, answers)
 
 	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Controller"))
 	wg.Done()
@@ -67,5 +68,9 @@ func yellowText(text string) string {
 }
 
 func formatModuleName(name string) string {
-	return "TEST"
+	splitName := strings.Split(name, "-")
+	for i, v := range splitName {
+		splitName[i] = strings.Title(v)
+	}
+	return strings.Join(splitName, "")
 }

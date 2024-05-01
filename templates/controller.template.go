@@ -1,17 +1,15 @@
 package templates
 
-// NOTE: if module contains hyphen (-) need to consolidate that
-// to PascalCase
 var ControllerTemplate = `
-{{with $pMN := call .formatModuleName .ModuleName}}
+{{with $pMN := formatModuleName $.ModuleName}}
 import { Controller } from "@nestjs/common"
 
-import { {{.ModuleName}}ControllerAdapters } from "@{{.ModuleName}}/adapters/controller.adapters"
+import { {{$pMN}}ControllerAdapters } from "@{{$.ModuleName}}/adapters/controller.adapters"
 
-@Controller("{{.ModuleName}}")
-export class {{.ModuleName}}Controller {
+@Controller("{{$.ModuleName}}")
+export class {{$pMN}}Controller {
   public constructor(
-    private readonly _adapter: {{.ModuleName}}ControllerAdapters 
+    private readonly _adapter: {{$pMN}}ControllerAdapters 
   ) {}
 }
 {{end}}
