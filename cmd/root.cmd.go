@@ -65,6 +65,7 @@ func Execute() {
 
 	// pass wA to write stream
 	fmt.Printf("wizard answers::: %+v: ", wA)
+	generateFiles(wA)
 }
 
 func (w WizardState) Init() tea.Cmd {
