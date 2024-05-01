@@ -63,7 +63,6 @@ func Execute() {
 		Service:       updatedWS.selected[models.SERVICE],
 	}
 
-	// pass wA to write stream
 	fmt.Printf("wizard answers::: %+v: ", wA)
 	generateFiles(wA)
 }

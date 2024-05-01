@@ -3,7 +3,7 @@ package templates
 // NOTE: if module contains hyphen (-) need to consolidate that
 // to PascalCase
 var ControllerTemplate = `
-{{with $pMN := call formatModuleName .ModuleName}}
+{{with $pMN := call .formatModuleName .ModuleName}}
 import { Controller } from "@nestjs/common"
 
 import { {{.ModuleName}}ControllerAdapters } from "@{{.ModuleName}}/adapters/controller.adapters"
@@ -16,7 +16,3 @@ export class {{.ModuleName}}Controller {
 }
 {{end}}
 `
-
-func formatModuleName(name string) string {
-	return "TEST"
-}
