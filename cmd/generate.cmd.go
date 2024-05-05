@@ -15,7 +15,8 @@ import (
 var wg sync.WaitGroup
 
 var tempFuncs = template.FuncMap{
-	"formatModuleName": formatModuleName,
+	"formatModuleName":     formatModuleName,
+	"formatModuleNameEnum": formatModuleNameEnum,
 }
 
 func generateFiles(answers *models.WizardAnswers) {
