@@ -34,13 +34,14 @@ func generateFiles(answers *models.WizardAnswers) {
 
 func generateController(cwd string, answers *models.WizardAnswers) error {
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Controller"))
-	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/controllers/", cwd), 0744)
+	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
+	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/controllers/", modulePath), 0744)
 	if mkDirErr != nil {
 		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create controller directory"), mkDirErr)
 		os.Exit(1)
 	}
 
-	w, err := os.Create(fmt.Sprintf("%s/controllers/%s.controller.ts", cwd, answers.ModuleName))
+	w, err := os.Create(fmt.Sprintf("%s/controllers/%s.controller.ts", modulePath, answers.ModuleName))
 	if err != nil {
 		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create controller file"), err)
 		os.Exit(1)
@@ -51,6 +52,78 @@ func generateController(cwd string, answers *models.WizardAnswers) error {
 	cTmpl.Execute(w, answers)
 
 	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Controller"))
+	wg.Done()
+	return nil
+}
+
+func generateModule(cwd string, answers *models.WizardAnswers) error {
+	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Module"))
+	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
+	mkDirErr := os.MkdirAll(modulePath, 0744)
+	if mkDirErr != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create module directory"), mkDirErr)
+		os.Exit(1)
+	}
+
+	w, err := os.Create(fmt.Sprintf("%s/%s.module.ts", modulePath, answers.ModuleName))
+	if err != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create module file"), err)
+		os.Exit(1)
+	}
+	defer w.Close()
+
+	mTmpl := template.Must(template.New("module").Funcs(tempFuncs).Parse(ct.ModuleTemplate))
+	mTmpl.Execute(w, answers)
+
+	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Module"))
+	wg.Done()
+	return nil
+}
+
+func generateRepository(cwd string, answers *models.WizardAnswers) error {
+	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Repository"))
+	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
+	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/repository/", modulePath), 0744)
+	if mkDirErr != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create repository directory"), mkDirErr)
+		os.Exit(1)
+	}
+
+	w, err := os.Create(fmt.Sprintf("%s/repository/%s.repository.ts", modulePath, answers.ModuleName))
+	if err != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create repository file"), err)
+		os.Exit(1)
+	}
+	defer w.Close()
+
+	rTmpl := template.Must(template.New("repository").Funcs(tempFuncs).Parse(ct.RepositoryTemplate))
+	rTmpl.Execute(w, answers)
+
+	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Repository"))
+	wg.Done()
+	return nil
+}
+
+func generateService(cwd string, answers *models.WizardAnswers) error {
+	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Service"))
+	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
+	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/services/", modulePath), 0744)
+	if mkDirErr != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create services directory"), mkDirErr)
+		os.Exit(1)
+	}
+
+	w, err := os.Create(fmt.Sprintf("%s/services/%s.service.ts", modulePath, answers.ModuleName))
+	if err != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create service file"), err)
+		os.Exit(1)
+	}
+	defer w.Close()
+
+	sTmpl := template.Must(template.New("service").Funcs(tempFuncs).Parse(ct.ServiceTemplate))
+	sTmpl.Execute(w, answers)
+
+	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Service"))
 	wg.Done()
 	return nil
 }
@@ -73,4 +146,12 @@ func formatModuleName(name string) string {
 		splitName[i] = strings.Title(v)
 	}
 	return strings.Join(splitName, "")
+}
+
+func formatModuleNameEnum(name string) string {
+	splitName := strings.Split(name, "-")
+	for i, v := range splitName {
+		splitName[i] = strings.ToUpper(v)
+	}
+	return strings.Join(splitName, "_")
 }
