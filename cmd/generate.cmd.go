@@ -19,6 +19,13 @@ var tempFuncs = template.FuncMap{
 	"formatModuleNameEnum": formatModuleNameEnum,
 }
 
+/*
+ * TODO: Will implement ways for DTOs to be conditionally defined, rather than defining all of them
+ * at once in the DTO template file.
+ *
+ * TODO: Will condtionally populate files -- like the module file -- with the selected controllers,
+ * providers, imports, adapters, etc.
+ */
 func generateFiles(answers *models.WizardAnswers) {
 	defer wg.Wait()
 
@@ -29,29 +36,52 @@ func generateFiles(answers *models.WizardAnswers) {
 
 	generateModule(cwd, answers)
 
+	if answers.Controller || answers.QueueConsumer || answers.Service || answers.Repository {
+		generateAdapterDirectory(cwd, answers)
+		generateDtoDirectory(cwd, answers)
+	}
+
 	if answers.Controller {
-		wg.Add(1)
+		wg.Add(2)
 		go generateController(cwd, answers)
+		go generateControllerAdapters(cwd, answers)
 	}
 
 	if answers.QueueConsumer {
-		wg.Add(1)
+		wg.Add(2)
 		go generateQueueConsumer(cwd, answers)
+		go generateQueueConsumerAdapters(cwd, answers)
 	}
 
 	if answers.Repository {
-		wg.Add(1)
+		wg.Add(2)
 		go generateRepository(cwd, answers)
+		go generateRepositoryAdapters(cwd, answers)
 	}
 
 	if answers.Service {
-		wg.Add(1)
+		wg.Add(2)
 		go generateService(cwd, answers)
+		go generateServiceAdapters(cwd, answers)
 	}
 }
 
+func generateAdapterDirectory(cwd string, answers *models.WizardAnswers) error {
+	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Creating Adapter Directory"))
+	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
+	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/adapters/", modulePath), 0744)
+	if mkDirErr != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create adapter directory"), mkDirErr)
+		os.Exit(1)
+	}
+	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Creating Adapter Directory"))
+	return nil
+}
+
 func generateController(cwd string, answers *models.WizardAnswers) error {
+	defer wg.Done()
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Controller"))
+
 	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
 	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/controllers/", modulePath), 0744)
 	if mkDirErr != nil {
@@ -70,7 +100,52 @@ func generateController(cwd string, answers *models.WizardAnswers) error {
 	cTmpl.Execute(w, answers)
 
 	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Controller"))
-	wg.Done()
+	return nil
+}
+
+func generateControllerAdapters(cwd string, answers *models.WizardAnswers) error {
+	defer wg.Done()
+	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Controller Adapters"))
+
+	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
+	w, err := os.Create(fmt.Sprintf("%s/adapters/controller.adapters.ts", modulePath))
+	if err != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create controller adapter file"), err)
+		os.Exit(1)
+	}
+	defer w.Close()
+
+	caTmpl := template.Must(template.New("controller-adapters").Funcs(tempFuncs).Parse(ct.ControllerAdapterTemplate))
+	caTmpl.Execute(w, answers)
+
+	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Controller Adapters"))
+	return nil
+}
+
+func generateDtoDirectory(cwd string, answers *models.WizardAnswers) error {
+	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Creating DTO Directory"))
+	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
+	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/dtos/", modulePath), 0744)
+	if mkDirErr != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create DTO directory"), mkDirErr)
+		os.Exit(1)
+	}
+	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Creating DTO Directory"))
+
+	// NOTE: This DTO file creation is temporary until the conditional functionality explained
+	// in the above TODO is in place.
+	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Creating DTO File"))
+	w, err := os.Create(fmt.Sprintf("%s/dtos/%s.dtos.ts", modulePath, answers.ModuleName))
+	if err != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create DTO file"), err)
+		os.Exit(1)
+	}
+	defer w.Close()
+
+	dTmpl := template.Must(template.New("dto").Funcs(tempFuncs).Parse(ct.DtoTemplate))
+	dTmpl.Execute(w, answers)
+
+	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Creating DTO File"))
 	return nil
 }
 
@@ -113,11 +188,30 @@ func generateQueueConsumer(cwd string, answers *models.WizardAnswers) error {
 	}
 	defer w.Close()
 
-	rTmpl := template.Must(template.New("queue-consumer").Funcs(tempFuncs).Parse(ct.QueueConsumerTemplate))
-	rTmpl.Execute(w, answers)
+	qcTmpl := template.Must(template.New("queue-consumer").Funcs(tempFuncs).Parse(ct.QueueConsumerTemplate))
+	qcTmpl.Execute(w, answers)
 
 	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Queue Consumer"))
 	wg.Done()
+	return nil
+}
+
+func generateQueueConsumerAdapters(cwd string, answers *models.WizardAnswers) error {
+	defer wg.Done()
+	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Queue Consumer Adapters"))
+
+	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
+	w, err := os.Create(fmt.Sprintf("%s/adapters/queue-consumer.adapters.ts", modulePath))
+	if err != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create queue-consumer adapter file"), err)
+		os.Exit(1)
+	}
+	defer w.Close()
+
+	qcaTmpl := template.Must(template.New("queue-consumer-adapters").Funcs(tempFuncs).Parse(ct.QueueConsumerAdapterTemplate))
+	qcaTmpl.Execute(w, answers)
+
+	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Queue Consumer Adapters"))
 	return nil
 }
 
@@ -145,6 +239,25 @@ func generateRepository(cwd string, answers *models.WizardAnswers) error {
 	return nil
 }
 
+func generateRepositoryAdapters(cwd string, answers *models.WizardAnswers) error {
+	defer wg.Done()
+	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Repository Adapters"))
+
+	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
+	w, err := os.Create(fmt.Sprintf("%s/adapters/repository.adapters.ts", modulePath))
+	if err != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create repository adapter file"), err)
+		os.Exit(1)
+	}
+	defer w.Close()
+
+	raTmpl := template.Must(template.New("repository-adapters").Funcs(tempFuncs).Parse(ct.RepositoryAdapterTemplate))
+	raTmpl.Execute(w, answers)
+
+	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Repository Adapters"))
+	return nil
+}
+
 func generateService(cwd string, answers *models.WizardAnswers) error {
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Service"))
 	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
@@ -166,6 +279,25 @@ func generateService(cwd string, answers *models.WizardAnswers) error {
 
 	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Service"))
 	wg.Done()
+	return nil
+}
+
+func generateServiceAdapters(cwd string, answers *models.WizardAnswers) error {
+	defer wg.Done()
+	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Service Adapters"))
+
+	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
+	w, err := os.Create(fmt.Sprintf("%s/adapters/service.adapters.ts", modulePath))
+	if err != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create service adapter file"), err)
+		os.Exit(1)
+	}
+	defer w.Close()
+
+	saTmpl := template.Must(template.New("service-adapters").Funcs(tempFuncs).Parse(ct.ServiceAdapterTemplate))
+	saTmpl.Execute(w, answers)
+
+	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Service Adapters"))
 	return nil
 }
 

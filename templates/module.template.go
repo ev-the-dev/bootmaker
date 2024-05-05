@@ -1,8 +1,6 @@
 package templates
 
-var ModuleTemplate = `
-{{with $pMN := formatModuleName $.ModuleName}}
-import { Module } from "@nestjs/common"
+var ModuleTemplate = `{{with $pMN := formatModuleName $.ModuleName}}import { Module } from "@nestjs/common"
 
 import { PrismaModule as DatabaseModule } from "@database/prisma.module"
 
@@ -30,5 +28,4 @@ import { {{$pMN}}Service } from "./services/{{$.ModuleName}}.service"
   ]
 })
 export class {{$pMN}}Module { }
-{{end}}
-`
+{{end}}`

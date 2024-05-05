@@ -1,8 +1,6 @@
 package templates
 
-var ServiceTemplate = `
-{{with $pMN := formatModuleName $.ModuleName}}
-import { Injectable, NotImplementedException } from "@nestjs/common"
+var ServiceTemplate = `{{with $pMN := formatModuleName $.ModuleName}}import { Injectable, NotImplementedException } from "@nestjs/common"
 import { context, trace } from "@opentelemetry/api"
 
 import { {{$pMN}}ServiceAdapters } from "@{{$.ModuleName}}/adapters/service.adapters"
@@ -30,5 +28,4 @@ export class {{$pMN}}Service {
     throw new NotImplementedException()
   }
 }
-{{end}}
-`
+{{end}}`

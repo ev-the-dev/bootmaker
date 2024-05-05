@@ -1,8 +1,6 @@
 package templates
 
-var ControllerTemplate = `
-{{with $pMN := formatModuleName $.ModuleName}}
-import { Controller, Get, HttpCode, HttpStatus, NotImplementedException, Post, Req } from "@nestjs/common"
+var ControllerTemplate = `{{with $pMN := formatModuleName $.ModuleName}}import { Controller, Get, HttpCode, HttpStatus, NotImplementedException, Post, Req } from "@nestjs/common"
 import { context, trace } from "@opentelemetry/api"
 
 import { {{$pMN}}ControllerAdapters } from "@{{$.ModuleName}}/adapters/controller.adapters"
@@ -34,5 +32,4 @@ export class {{$pMN}}Controller {
     throw new NotImplementedException()
   }
 }
-{{end}}
-`
+{{end}}`

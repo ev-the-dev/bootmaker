@@ -1,8 +1,6 @@
 package templates
 
-var RepositoryTemplate = `
-{{with $pMN := formatModuleName $.ModuleName}}
-import { Injectable, NotImplementedException } from "@nestjs/common"
+var RepositoryTemplate = `{{with $pMN := formatModuleName $.ModuleName}}import { Injectable, NotImplementedException } from "@nestjs/common"
 import { trace } from "@opentelemetry/api"
 
 import { PrismaService } from "@database/services/prisma.service"
@@ -32,5 +30,4 @@ export class {{$pMN}}Repository {
     throw new NotImplementedException()
   }
 }
-{{end}}
-`
+{{end}}`
