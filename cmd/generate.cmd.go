@@ -26,9 +26,26 @@ func generateFiles(answers *models.WizardAnswers) {
 		log.Fatalf("Unable to get Current Working Directory: %v", cwdErr)
 	}
 
+	generateModule(cwd, answers)
+
 	if answers.Controller {
 		wg.Add(1)
 		go generateController(cwd, answers)
+	}
+
+	if answers.QueueConsumer {
+		wg.Add(1)
+		go generateQueueConsumer(cwd, answers)
+	}
+
+	if answers.Repository {
+		wg.Add(1)
+		go generateRepository(cwd, answers)
+	}
+
+	if answers.Service {
+		wg.Add(1)
+		go generateService(cwd, answers)
 	}
 }
 
@@ -76,6 +93,29 @@ func generateModule(cwd string, answers *models.WizardAnswers) error {
 	mTmpl.Execute(w, answers)
 
 	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Module"))
+	return nil
+}
+
+func generateQueueConsumer(cwd string, answers *models.WizardAnswers) error {
+	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Queue Consumer"))
+	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
+	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/queues/", modulePath), 0744)
+	if mkDirErr != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create queues directory"), mkDirErr)
+		os.Exit(1)
+	}
+
+	w, err := os.Create(fmt.Sprintf("%s/queues/consumers.queues.ts", modulePath))
+	if err != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create queue consumers file"), err)
+		os.Exit(1)
+	}
+	defer w.Close()
+
+	rTmpl := template.Must(template.New("queue-consumer").Funcs(tempFuncs).Parse(ct.QueueConsumerTemplate))
+	rTmpl.Execute(w, answers)
+
+	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Queue Consumer"))
 	wg.Done()
 	return nil
 }
