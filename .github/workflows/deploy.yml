@@ -31,7 +31,7 @@ jobs:
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Build
-        run: CGO_ENABLED=0 go build -ldflags="-w -X 'github.com/ev-the-dev/bootmaker/cmd.version=${{ env.VERSION }}'" -o bin/bootmaker
+        run: GOOS="darmin" GOARCH="arm64" CGO_ENABLED=0 go build -ldflags="-w -X 'github.com/ev-the-dev/bootmaker/cmd.version=${{ env.VERSION }}'" -o bin/bootmaker
 
       - name: Upload Binary
         uses: actions/upload-artifact@v4
