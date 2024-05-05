@@ -1,0 +1,26 @@
+{
+  "name": "@ev-the-dev/bootmaker",
+  "author": "ev-the-dev",
+  "version": "0.0.1",
+  "description": "NestJS Opinionated Module Structure Generator",
+  "license": "Apache-2.0",
+  "bin": {
+    "bootmaker": "bootmaker"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ev-the-dev/bootmaker.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/ev-the-dev/bootmaker#readme",
+  "bugs": {
+    "url": "https://github.com/ev-the-dev/bootmaker/issues"
+  },
+  "keywords": [
+    "mvc",
+    "nestjs",
+    "typescript",
+  ]
+}
