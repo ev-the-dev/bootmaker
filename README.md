@@ -33,7 +33,7 @@ exit the TUI and have the process continue to generation.
 
 ## Possible Future Improvements
 - Ability to create boilerplate files inside of an already existing module
-- Condtionally generate DTOs based off of user's checked items
+- Conditionally generate DTOs based off of user's checked items
 - Conditionally include appropriate imports, controllers, services, etc.
   according to user's checked items
 - Provide config functionality for user to determine project structure they'd
