@@ -34,41 +34,41 @@ func generateFiles(answers *models.WizardAnswers) {
 		log.Fatalf("Unable to get Current Working Directory: %v", cwdErr)
 	}
 
-	generateModule(cwd, answers)
+	modulePath := fmt.Sprintf("%s/src/%s", cwd, answers.ModuleName)
+	generateModule(modulePath, answers)
 
 	if answers.Controller || answers.QueueConsumer || answers.Service || answers.Repository {
-		generateAdapterDirectory(cwd, answers)
-		generateDtoDirectory(cwd, answers)
+		generateAdapterDirectory(modulePath, answers)
+		generateDtoDirectory(modulePath, answers)
 	}
 
 	if answers.Controller {
 		wg.Add(2)
-		go generateController(cwd, answers)
-		go generateControllerAdapters(cwd, answers)
+		go generateController(modulePath, answers)
+		go generateControllerAdapters(modulePath, answers)
 	}
 
 	if answers.QueueConsumer {
 		wg.Add(2)
-		go generateQueueConsumer(cwd, answers)
-		go generateQueueConsumerAdapters(cwd, answers)
+		go generateQueueConsumer(modulePath, answers)
+		go generateQueueConsumerAdapters(modulePath, answers)
 	}
 
 	if answers.Repository {
 		wg.Add(2)
-		go generateRepository(cwd, answers)
-		go generateRepositoryAdapters(cwd, answers)
+		go generateRepository(modulePath, answers)
+		go generateRepositoryAdapters(modulePath, answers)
 	}
 
 	if answers.Service {
 		wg.Add(2)
-		go generateService(cwd, answers)
-		go generateServiceAdapters(cwd, answers)
+		go generateService(modulePath, answers)
+		go generateServiceAdapters(modulePath, answers)
 	}
 }
 
-func generateAdapterDirectory(cwd string, answers *models.WizardAnswers) error {
+func generateAdapterDirectory(modulePath string, answers *models.WizardAnswers) error {
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Creating Adapter Directory"))
-	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
 	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/adapters/", modulePath), 0744)
 	if mkDirErr != nil {
 		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create adapter directory"), mkDirErr)
@@ -78,11 +78,10 @@ func generateAdapterDirectory(cwd string, answers *models.WizardAnswers) error {
 	return nil
 }
 
-func generateController(cwd string, answers *models.WizardAnswers) error {
+func generateController(modulePath string, answers *models.WizardAnswers) error {
 	defer wg.Done()
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Controller"))
 
-	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
 	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/controllers/", modulePath), 0744)
 	if mkDirErr != nil {
 		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create controller directory"), mkDirErr)
@@ -103,11 +102,10 @@ func generateController(cwd string, answers *models.WizardAnswers) error {
 	return nil
 }
 
-func generateControllerAdapters(cwd string, answers *models.WizardAnswers) error {
+func generateControllerAdapters(modulePath string, answers *models.WizardAnswers) error {
 	defer wg.Done()
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Controller Adapters"))
 
-	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
 	w, err := os.Create(fmt.Sprintf("%s/adapters/controller.adapters.ts", modulePath))
 	if err != nil {
 		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create controller adapter file"), err)
@@ -122,9 +120,8 @@ func generateControllerAdapters(cwd string, answers *models.WizardAnswers) error
 	return nil
 }
 
-func generateDtoDirectory(cwd string, answers *models.WizardAnswers) error {
+func generateDtoDirectory(modulePath string, answers *models.WizardAnswers) error {
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Creating DTO Directory"))
-	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
 	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/dtos/", modulePath), 0744)
 	if mkDirErr != nil {
 		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create DTO directory"), mkDirErr)
@@ -149,9 +146,8 @@ func generateDtoDirectory(cwd string, answers *models.WizardAnswers) error {
 	return nil
 }
 
-func generateModule(cwd string, answers *models.WizardAnswers) error {
+func generateModule(modulePath string, answers *models.WizardAnswers) error {
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Module"))
-	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
 	mkDirErr := os.MkdirAll(modulePath, 0744)
 	if mkDirErr != nil {
 		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create module directory"), mkDirErr)
@@ -172,9 +168,8 @@ func generateModule(cwd string, answers *models.WizardAnswers) error {
 	return nil
 }
 
-func generateQueueConsumer(cwd string, answers *models.WizardAnswers) error {
+func generateQueueConsumer(modulePath string, answers *models.WizardAnswers) error {
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Queue Consumer"))
-	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
 	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/queues/", modulePath), 0744)
 	if mkDirErr != nil {
 		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create queues directory"), mkDirErr)
@@ -196,11 +191,10 @@ func generateQueueConsumer(cwd string, answers *models.WizardAnswers) error {
 	return nil
 }
 
-func generateQueueConsumerAdapters(cwd string, answers *models.WizardAnswers) error {
+func generateQueueConsumerAdapters(modulePath string, answers *models.WizardAnswers) error {
 	defer wg.Done()
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Queue Consumer Adapters"))
 
-	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
 	w, err := os.Create(fmt.Sprintf("%s/adapters/queue-consumer.adapters.ts", modulePath))
 	if err != nil {
 		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create queue-consumer adapter file"), err)
@@ -215,9 +209,8 @@ func generateQueueConsumerAdapters(cwd string, answers *models.WizardAnswers) er
 	return nil
 }
 
-func generateRepository(cwd string, answers *models.WizardAnswers) error {
+func generateRepository(modulePath string, answers *models.WizardAnswers) error {
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Repository"))
-	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
 	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/repository/", modulePath), 0744)
 	if mkDirErr != nil {
 		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create repository directory"), mkDirErr)
@@ -239,11 +232,10 @@ func generateRepository(cwd string, answers *models.WizardAnswers) error {
 	return nil
 }
 
-func generateRepositoryAdapters(cwd string, answers *models.WizardAnswers) error {
+func generateRepositoryAdapters(modulePath string, answers *models.WizardAnswers) error {
 	defer wg.Done()
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Repository Adapters"))
 
-	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
 	w, err := os.Create(fmt.Sprintf("%s/adapters/repository.adapters.ts", modulePath))
 	if err != nil {
 		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create repository adapter file"), err)
@@ -258,9 +250,8 @@ func generateRepositoryAdapters(cwd string, answers *models.WizardAnswers) error
 	return nil
 }
 
-func generateService(cwd string, answers *models.WizardAnswers) error {
+func generateService(modulePath string, answers *models.WizardAnswers) error {
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Service"))
-	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
 	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/services/", modulePath), 0744)
 	if mkDirErr != nil {
 		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create services directory"), mkDirErr)
@@ -282,11 +273,10 @@ func generateService(cwd string, answers *models.WizardAnswers) error {
 	return nil
 }
 
-func generateServiceAdapters(cwd string, answers *models.WizardAnswers) error {
+func generateServiceAdapters(modulePath string, answers *models.WizardAnswers) error {
 	defer wg.Done()
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Service Adapters"))
 
-	modulePath := fmt.Sprintf("%s/%s/", cwd, answers.ModuleName)
 	w, err := os.Create(fmt.Sprintf("%s/adapters/service.adapters.ts", modulePath))
 	if err != nil {
 		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create service adapter file"), err)

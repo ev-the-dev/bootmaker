@@ -4,6 +4,7 @@ var QueueConsumerTemplate = `{{with $pMN := formatModuleName $.ModuleName}}impor
 import { context, trace } from "@opentelemetry/api"
 
 import { {{$pMN}}QueueConsumerAdapters } from "@{{$.ModuleName}}/adapters/queue-consumer.adapters"
+import { Create{{$pMN}}MessageValidator } from "@{{$.ModuleName}}/decorators/queue-consumer.validators"
 import { {{$pMN}}Service } from "@{{$.ModuleName}}/services/{{$.ModuleName}}.service"
 
 import type { ICreate{{$pMN}}MessageDTO } from "@{{$.ModuleName}}/dtos/{{$.ModuleName}}.dtos"
@@ -21,10 +22,11 @@ export class {{$pMN}}QueueConsumers {
     this._tracer = trace.getTracer("{{$.ModuleName}}-queue-consumer")
   }
 
-  {{with $eMN := formatModuleNameEnum $.ModuleName}}@SqsMessageHandler({{$eMN}}_QUEUE_CONSUMER_METADATA.CREATE)
-  {{end}}
+  {{with $eMN := formatModuleNameEnum $.ModuleName}}@SqsMessageHandler({{$eMN}}_QUEUE_CONSUMER_METADATA.CREATE){{end}}
+  @Create{{$pMN}}MessageValidator()
   public async create(message: IMessage<ICreate{{$pMN}}MessageDTO>): Promise<void> {
     throw new NotImplementedException()
   }
 }
-{{end}}`
+{{end}}
+`

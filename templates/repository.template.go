@@ -30,4 +30,5 @@ export class {{$pMN}}Repository {
     throw new NotImplementedException()
   }
 }
-{{end}}`
+{{end}}
+`

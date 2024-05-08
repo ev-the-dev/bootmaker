@@ -4,6 +4,7 @@ var ControllerTemplate = `{{with $pMN := formatModuleName $.ModuleName}}import {
 import { context, trace } from "@opentelemetry/api"
 
 import { {{$pMN}}ControllerAdapters } from "@{{$.ModuleName}}/adapters/controller.adapters"
+import { Create{{$pMN}}Validator } from "@{{$.ModuleName}}/decorators/controller.validators"
 import { {{$pMN}}Service } from "@{{$.ModuleName}}/services/{{$.ModuleName}}.service"
 
 import type { ICreate{{$pMN}}ClientDTO, I{{$pMN}}ClientDTO } from "@{{$.ModuleName}}/dtos/{{$.ModuleName}}.dtos"
@@ -22,6 +23,7 @@ export class {{$pMN}}Controller {
 
   @Post()
   @HttpCode(@HttpStatus.CREATED)
+  @Create{{$pMN}}Validator()
   public async create(@Req() req: ControllerRequestType<ICreate{{$pMN}}ClientDTO>): ControllerResponseType<I{{$pMN}}ClientDTO> {
     throw new NotImplementedException()
   }
@@ -32,4 +34,5 @@ export class {{$pMN}}Controller {
     throw new NotImplementedException()
   }
 }
-{{end}}`
+{{end}}
+`

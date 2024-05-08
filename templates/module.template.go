@@ -28,4 +28,5 @@ import { {{$pMN}}Service } from "./services/{{$.ModuleName}}.service"
   ]
 })
 export class {{$pMN}}Module { }
-{{end}}`
+{{end}}
+`

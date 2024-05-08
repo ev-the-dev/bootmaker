@@ -26,4 +26,5 @@ export interface I{{$pMN}}ServiceDTO extends I{{$pMN}}DataDTO {}
  */
 export interface ICreate{{$pMN}}DataDTO extends I{{$pMN}}DataDTO {}
 export interface I{{$pMN}}DataDTO {}
-{{end}}`
+{{end}}
+`

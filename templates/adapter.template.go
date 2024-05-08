@@ -42,7 +42,8 @@ export class {{$pMN}}QueueConsumerAdapters {
     }
   }
 }
-{{end}}`
+{{end}}
+`
 
 var RepositoryAdapterTemplate = `{{with $pMN := formatModuleName $.ModuleName}}import { Injectable } from "@nestjs/common"
 import { $Enums, Prisma, {{$pMN}} as Prisma{{$pMN}} } from "@prisma/client"
@@ -67,7 +68,8 @@ export class {{$pMN}}RepositoryAdapters {
     }
   }
 }
-{{end}}`
+{{end}}
+`
 
 var ServiceAdapterTemplate = `{{with $pMN := formatModuleName $.ModuleName}}import { Injectable } from "@nestjs/common"
 
@@ -93,4 +95,5 @@ export class {{$pMN}}ServiceAdapters {
     }
   }
 }
-{{end}}`
+{{end}}
+`

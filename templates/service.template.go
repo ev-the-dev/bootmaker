@@ -28,4 +28,5 @@ export class {{$pMN}}Service {
     throw new NotImplementedException()
   }
 }
-{{end}}`
+{{end}}
+`
