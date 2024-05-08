@@ -1,6 +1,6 @@
 package templates
 
-var ServiceTemplate = `{{with $pMN := formatModuleName $.ModuleName}}import { Injectable, NotImplementedException } from "@nestjs/common"
+var ServiceTemplate = `{{with $pMN := formatModuleName $.ModuleName}}import { Injectable } from "@nestjs/common"
 import { context, trace } from "@opentelemetry/api"
 
 import { {{$pMN}}ServiceAdapters } from "@{{$.ModuleName}}/adapters/service.adapters"
@@ -20,12 +20,25 @@ export class {{$pMN}}Service {
     this._tracer = trace.getTracer("{{$.ModuleName}}-service")
   }
 
-  public async create(createEntity: ICreate{{$pMN}}ServiceDTO): Promise<I{{$pMN}}ServiceDTO> {
-    throw new NotImplementedException()
+  public async create(ctx: Context, createEntity: ICreate{{$pMN}}ServiceDTO): Promise<I{{$pMN}}ServiceDTO> {
+    const span = this._tracer.startSpan("create", {}, ctx)
+
+    const entityToCreate = this._adapters.create.serviceToData(createEntity)
+    const createdEntity = await this._repository.create(context.active(), entityToCreate)
+    const entityToReturn = this._adapters.base.dataToService(createdEntity)
+
+    span.end()
+    return entityToReturn
   }
 
-  public async getById(id: string): Promise<I{{$pMN}}ServiceDTO> {
-    throw new NotImplementedException()
+  public async getById(ctx: Context, id: string): Promise<I{{$pMN}}ServiceDTO> {
+    const span = this._tracer.startSpan("create", {}, ctx)
+
+    const fetchedEntity = await this._repository.getById(context.active(), id)
+    const entityToReturn = this._adapters.base.dataToService(createdEntity)
+
+    span.end()
+    return entityToReturn
   }
 }
 {{end}}

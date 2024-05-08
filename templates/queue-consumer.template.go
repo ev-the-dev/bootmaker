@@ -25,7 +25,12 @@ export class {{$pMN}}QueueConsumers {
   {{with $eMN := formatModuleNameEnum $.ModuleName}}@SqsMessageHandler({{$eMN}}_QUEUE_CONSUMER_METADATA.CREATE){{end}}
   @Create{{$pMN}}MessageValidator()
   public async create(message: IMessage<ICreate{{$pMN}}MessageDTO>): Promise<void> {
-    throw new NotImplementedException()
+    const span = this._tracer.startSpan("create", {}, context.active())
+
+    const messageToCreate = this._adapters.create.messageToService(message)
+    const createdMessage = await this._service.create(context.active(), messageToCreate)
+
+    span.end()
   }
 }
 {{end}}
