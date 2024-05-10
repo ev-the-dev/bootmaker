@@ -35,7 +35,7 @@ export class {{$pMN}}Service {
     const span = this._tracer.startSpan("create", {}, ctx)
 
     const fetchedEntity = await this._repository.getById(context.active(), id)
-    const entityToReturn = this._adapters.base.dataToService(createdEntity)
+    const entityToReturn = this._adapters.base.dataToService(fetchedEntity)
 
     span.end()
     return entityToReturn

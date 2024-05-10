@@ -1,6 +1,6 @@
 package templates
 
-var QueueConsumerTemplate = `{{with $pMN := formatModuleName $.ModuleName}}import { Injectable, NotImplementedException } from "@nestjs/common"
+var QueueConsumerTemplate = `{{with $pMN := formatModuleName $.ModuleName}}import { Injectable } from "@nestjs/common"
 import { context, trace } from "@opentelemetry/api"
 
 import { {{$pMN}}QueueConsumerAdapters } from "@{{$.ModuleName}}/adapters/queue-consumer.adapters"
