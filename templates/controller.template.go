@@ -8,7 +8,7 @@ import { Create{{$pMN}}Validator, Get{{$pMN}}ByIdValidator } from "@{{$.ModuleNa
 import { {{$pMN}}Service } from "@{{$.ModuleName}}/services/{{$.ModuleName}}.service"
 
 import type { ICreate{{$pMN}}ClientDTO, I{{$pMN}}ClientDTO } from "@{{$.ModuleName}}/dtos/{{$.ModuleName}}.dtos"
-import type { Context, Tracer } from "@opentelemetry/api"
+import type { Tracer } from "@opentelemetry/api"
 
 
 @Controller("{{$.ModuleName}}")
@@ -22,7 +22,7 @@ export class {{$pMN}}Controller {
   }
 
   @Post()
-  @HttpCode(@HttpStatus.CREATED)
+  @HttpCode(HttpStatus.CREATED)
   @Create{{$pMN}}Validator()
   public async create(@Req() req: ControllerRequestType<ICreate{{$pMN}}ClientDTO>): ControllerResponseType<I{{$pMN}}ClientDTO> {
     const span = this._tracer.startSpan("create", {}, context.active())
@@ -38,7 +38,7 @@ export class {{$pMN}}Controller {
   }
 
   @Get(":id")
-  @HttpCode(@HttpStatus.OK)
+  @HttpCode(HttpStatus.OK)
   @Get{{$pMN}}ByIdValidator()
   public async getById(@Req() req: ControllerRequestType<void>): ControllerResponseType<I{{$pMN}}ClientDTO> {
     const span = this._tracer.startSpan("getById", {}, context.active())
