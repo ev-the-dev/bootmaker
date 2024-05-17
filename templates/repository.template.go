@@ -57,3 +57,35 @@ export class {{$pMN}}Repository {
 }
 {{end}}
 `
+
+var RepositorySpecTemplate = `{{with $pMN := formatModuleName $.ModuleName}}import { Test } from "@nestjs/testing"
+
+import { PrismaService } from "@database/services/prisma.service"
+import { {{$pMN}}Repository } from "@{{$.ModuleName}}/repository/{{$.ModuleName}}.repository"
+import { {{$pMN}}RepositoryAdapters } from "@{{$.ModuleName}}/adapters/repository.adapters"
+
+import type { TestingModule } from "@nestjs/testing"
+
+jest.mock("@database/services/prisma.service")
+describe("{{$pMN}}Repository", () => {
+  let repository: {{$pMN}}Repository
+
+  beforeAll(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        {{$pMN}}Repository,
+        {{$pMN}}Repository,
+        {{$pMN}}RepositoryAdapters,
+        PrismaService
+      ]
+    }).compile()
+
+    repository = module.get({{$pMN}}Repository)
+  })
+
+  it("should be defined", () => {
+    expect(repository).toBeDefined()
+  })
+})
+{{end}}
+`

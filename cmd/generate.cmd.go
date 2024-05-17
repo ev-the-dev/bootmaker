@@ -99,6 +99,28 @@ func generateController(modulePath string, answers *models.WizardAnswers) error 
 	cTmpl.Execute(w, answers)
 
 	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Controller"))
+
+	/*
+	 * SPEC
+	 */
+	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Controller Spec"))
+	mkDirErr = os.MkdirAll(fmt.Sprintf("%s/controllers/test", modulePath), 0744)
+	if mkDirErr != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create controller test directory"), mkDirErr)
+		os.Exit(1)
+	}
+
+	w, err = os.Create(fmt.Sprintf("%s/controllers/test/%s.controller.ts", modulePath, answers.ModuleName))
+	if err != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create controller spec file"), err)
+		os.Exit(1)
+	}
+
+	cTmpl = template.Must(template.New("controller-spec").Funcs(tempFuncs).Parse(ct.ControllerSpecTemplate))
+	cTmpl.Execute(w, answers)
+
+	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Controller Spec"))
+
 	return nil
 }
 
@@ -210,7 +232,9 @@ func generateQueueConsumerAdapters(modulePath string, answers *models.WizardAnsw
 }
 
 func generateRepository(modulePath string, answers *models.WizardAnswers) error {
+	defer wg.Done()
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Repository"))
+
 	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/repository/", modulePath), 0744)
 	if mkDirErr != nil {
 		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create repository directory"), mkDirErr)
@@ -228,7 +252,28 @@ func generateRepository(modulePath string, answers *models.WizardAnswers) error 
 	rTmpl.Execute(w, answers)
 
 	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Repository"))
-	wg.Done()
+
+	/*
+	 * SPEC
+	 */
+	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Repository Spec"))
+	mkDirErr = os.MkdirAll(fmt.Sprintf("%s/repository/test", modulePath), 0744)
+	if mkDirErr != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create repository test directory"), mkDirErr)
+		os.Exit(1)
+	}
+
+	w, err = os.Create(fmt.Sprintf("%s/repository/test/%s.repository.ts", modulePath, answers.ModuleName))
+	if err != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create repository spec file"), err)
+		os.Exit(1)
+	}
+
+	rTmpl = template.Must(template.New("repository-spec").Funcs(tempFuncs).Parse(ct.RepositorySpecTemplate))
+	rTmpl.Execute(w, answers)
+
+	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Repository Spec"))
+
 	return nil
 }
 
@@ -251,7 +296,9 @@ func generateRepositoryAdapters(modulePath string, answers *models.WizardAnswers
 }
 
 func generateService(modulePath string, answers *models.WizardAnswers) error {
+	defer wg.Done()
 	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Service"))
+
 	mkDirErr := os.MkdirAll(fmt.Sprintf("%s/services/", modulePath), 0744)
 	if mkDirErr != nil {
 		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create services directory"), mkDirErr)
@@ -269,7 +316,28 @@ func generateService(modulePath string, answers *models.WizardAnswers) error {
 	sTmpl.Execute(w, answers)
 
 	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Service"))
-	wg.Done()
+
+	/*
+	 * SPEC
+	 */
+	fmt.Printf("\n#####\n%s\n#####\n", yellowText("Generating Service Spec"))
+	mkDirErr = os.MkdirAll(fmt.Sprintf("%s/services/test", modulePath), 0744)
+	if mkDirErr != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create services test directory"), mkDirErr)
+		os.Exit(1)
+	}
+
+	w, err = os.Create(fmt.Sprintf("%s/services/test/%s.service.ts", modulePath, answers.ModuleName))
+	if err != nil {
+		fmt.Printf("\n!!!!!\n%s\n!!!!!\nerr: %v\n", redText("Unable to create service spec file"), err)
+		os.Exit(1)
+	}
+
+	sTmpl = template.Must(template.New("service-spec").Funcs(tempFuncs).Parse(ct.ServiceSpecTemplate))
+	sTmpl.Execute(w, answers)
+
+	fmt.Printf("\n#####\n%s\n#####\n", greenText("Done Generating Service Spec"))
+
 	return nil
 }
 

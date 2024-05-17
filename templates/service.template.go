@@ -43,3 +43,34 @@ export class {{$pMN}}Service {
 }
 {{end}}
 `
+
+var ServiceSpecTemplate = `{{with $pMN := formatModuleName $.ModuleName}}import { Test } from "@nestjs/testing"
+
+import { {{$pMN}}ServiceAdapters } from "@{{$.ModuleName}}/adapters/service.adapters"
+import { {{$pMN}}Repository } from "@{{$.ModuleName}}/repository/{{$.ModuleName}}.repository"
+import { {{$pMN}}Service } from "@{{$.ModuleName}}/services/{{$.ModuleName}}.service"
+
+import type { TestingModule } from "@nestjs/testing"
+
+jest.mock("@{{$.ModuleName}}/repository/{{$.ModuleName}}.repository")
+describe("{{$pMN}}Service", () => {
+  let service: {{$pMN}}Service
+
+  beforeAll(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        {{$pMN}}Repository,
+        {{$pMN}}Service,
+        {{$pMN}}ServiceAdapters,
+      ]
+    }).compile()
+
+    service = module.get({{$pMN}}Service)
+  })
+
+  it("should be defined", () => {
+    expect(service).toBeDefined()
+  })
+})
+{{end}}
+`

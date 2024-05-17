@@ -54,3 +54,34 @@ export class {{$pMN}}Controller {
 }
 {{end}}
 `
+
+var ControllerSpecTemplate = `{{with $pMN := formatModuleName $.ModuleName}}import { Test } from "@nestjs/testing"
+
+import { {{$pMN}}ControllerAdapters } from "@{{$.ModuleName}}/adapters/controller.adapters"
+import { {{$pMN}}Controller } from "@{{$.ModuleName}}/controllers/{{$.ModuleName}}.controller"
+import { {{$pMN}}Service } from "@{{$.ModuleName}}/services/{{$.ModuleName}}.service"
+
+import type { TestingModule } from "@nestjs/testing"
+
+jest.mock("@{{$.ModuleName}}/services/{{$.ModuleName}}.service")
+describe("{{$pMN}}Controller", () => {
+  let controller: {{$pMN}}Controller
+
+  beforeAll(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [{{$pMN}}Controller],
+      providers: [
+        {{$pMN}}ControllerAdapters,
+        {{$pMN}}Service,
+      ]
+    }).compile()
+
+    controller = module.get({{$pMN}}Controller)
+  })
+
+  it("should be defined", () => {
+    expect(controller).toBeDefined()
+  })
+})
+{{end}}
+`
